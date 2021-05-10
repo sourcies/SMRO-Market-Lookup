@@ -17,15 +17,15 @@ ${CONFIG.command_prefix}h Poring Card
 \`\`\`
 `
 
-const lookUpHistory = (msg) => {
+const lookUpHistory = (msg, client) => {
   try {
-    logger.debug(msg.content)
+    logger.debug(`${msg.author.tag}: ${msg.content}`)
     if (msg.content.trim().split(' ').length < 2) return msg.reply(errMsg)
 
     const arg = msg.content.trim().split(' ').slice(1).join(' ')
 
     if (isNumber(arg)) return queryById(arg, msg);
-    return queryByName(arg, msg, BOT);
+    return queryByName(arg, msg, client);
   }
   catch (e) {
     logger.error(e)

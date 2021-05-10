@@ -4,10 +4,10 @@ const { loadToml } = require('src/helpers/tomlLoader.js')
 
 const CONFIG = loadToml('config/config.toml')
 
-const handleCommand = (msg) => {
+const handleCommand = (msg, client) => {
   const command = msg.content.split(CONFIG.command_prefix)[1].split(' ')[0]
-  if (command === 'h') return lookUpHistory(msg)
-  if (command === 'ws') return lookUpWhosell(msg)
+  if (command === 'h') return lookUpHistory(msg, client)
+  if (command === 'ws') return lookUpWhosell(msg, client)
   return msg.reply(`Wrong command`)
 }
 

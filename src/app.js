@@ -10,7 +10,7 @@ const client = new discord.Client()
 client.on('message', (msg) => {
   if (msg.author.bot) return
   if (!msg.content.startsWith(CONFIG.command_prefix)) return
-  return handleCommand(msg)
+  return handleCommand(msg, client)
 })
 
 client.on('ready', () => {

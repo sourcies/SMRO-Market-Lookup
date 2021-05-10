@@ -1,4 +1,3 @@
-const logger = require("logger")
 const fetch = require('node-fetch')
 const cheerio = require('cheerio')
 const math = require('mathjs')
