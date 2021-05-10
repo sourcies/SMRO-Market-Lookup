@@ -19,6 +19,7 @@ ${CONFIG.command_prefix}h Poring Card
 
 const lookUpHistory = (msg) => {
   try {
+    logger.debug(msg.content)
     if (msg.content.trim().split(' ').length < 2) return msg.reply(errMsg)
 
     const arg = msg.content.trim().split(' ').slice(1).join(' ')

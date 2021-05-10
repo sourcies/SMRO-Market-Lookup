@@ -1,3 +1,6 @@
 node_modules/
 config/*
 !config/template.toml
+data.csv
+plot.png
+table.txt

@@ -14,7 +14,16 @@ const queryById = async (arg, msg) => {
   const body = await response.text()
 
   const $ = cheerio.load(body)
-  if ($('div.adjust').length === 0) return msg.reply('Invalid ID')
+  
+  // Return error message if invalid id
+  if ($('div.adjust').length === 0) {
+    const embed = new discord.MessageEmbed()
+      .setTitle('Invaild ID')
+      .setColor(16711680)
+      .setTimestamp()
+
+    return msg.reply(embed)
+  }
 
   const h3Elements = $('h3')
 
@@ -40,6 +49,7 @@ const queryById = async (arg, msg) => {
   // Scrape the price of past sales from Vending Price History
   const arrOfPrices = []
   const arrToCsv = []
+  const arrToTable = []
   vendingPriceHistoryTable?.find('tbody').find('tr').each(function (i, elem) {
     const priceString = $(this).find('td.price').text()
     const priceStringClean = priceString.trim().slice(0, -1).replace(/,/g, '').trim()
@@ -52,8 +62,8 @@ const queryById = async (arg, msg) => {
     const card4 = $(this).find('td').eq(5).text().trim()
     const amount = $(this).find('td').last().text().trim()
 
-    arrToCsv.push([date, card1, card2, card3, card4, priceNumber.toLocaleString('en-US'), amount])
-    arrTo
+    arrToTable.push([date, card1, card2, card3, card4, priceNumber.toLocaleString('en-US'), amount])
+    arrToCsv.push([date.split(' ')[0], priceNumber])
     arrOfPrices.push(isNaN(priceNumber) ? 0 : priceNumber)
   })
 
@@ -63,14 +73,15 @@ const queryById = async (arg, msg) => {
   const lowestCurrentSale = (arrayOfSales[0])?.toLocaleString('en-US')
   const dateTo = vendingPriceHistoryTable?.find('tbody').find('tr').first().find('td').first().text()
   const dateFrom = vendingPriceHistoryTable?.find('tbody').find('tr').last().find('td').first().text()
-  const mean = arrOfPrices.length ? math.mean(arrOfPrices).toLocaleString('en-US') : undefined
-  const median = arrOfPrices.length ? math.median(arrOfPrices).toLocaleString('en-US') : undefined
+  const mean = arrOfPrices.length ? Math.floor(math.mean(arrOfPrices)).toLocaleString('en-US') : undefined
+  const median = arrOfPrices.length ? Math.floor(math.median(arrOfPrices)).toLocaleString('en-US') : undefined
   const mode = arrOfPrices.length ? math.mode(arrOfPrices) : undefined
   const lowestPrice = arrOfPrices.length ? math.min(arrOfPrices).toLocaleString('en-US') : undefined
   const highestPrice = arrOfPrices.length ? math.max(arrOfPrices).toLocaleString('en-US') : undefined
   const highestFreqFromArr = arrOfPrices.reduce((acc, currentVal) => { return (currentVal == mode[0]) ? acc + 1 : acc } , 0)
   const highestFrequency = arrOfPrices.length ? highestFreqFromArr : undefined
 
+  // Return error message if table not found
   if (!vendingPriceHistoryTable) {
     const embed = new discord.MessageEmbed()
       .setTitle('Vending Price History table not found')
@@ -83,15 +94,15 @@ const queryById = async (arg, msg) => {
     return msg.reply(embed)
   }
 
-  // Build table
-  // const csvWriter = createCsvWriter({
-  //   header: ['date', 'card1', 'card2', 'card3', 'card4', 'price', 'amount'],
-  //   path: 'data.csv'
-  // })
-  // await csvWriter.writeRecords(arrToCsv)
-  // execSync('python3 src/helpers/generateTable.py')
+  // Build csv
+  const csvWriter = createCsvWriter({
+    header: ['date', 'price'],
+    path: 'data.csv'
+  })
+  await csvWriter.writeRecords(arrToCsv.reverse())
+  execSync(`python3 src/helpers/generateTable.py ${median}`)
 
-  const data = table(arrToCsv, { singleLine: true })
+  const data = table(arrToTable)
   writeFileSync('table.txt', data)
 
   const embed = new discord.MessageEmbed()
@@ -99,52 +110,42 @@ const queryById = async (arg, msg) => {
     .setURL(url)
     .setTimestamp()
     .setColor(15913595)
+    .setFooter(`Requested by ${msg.author.tag}`)
     .attachFiles('table.txt')
-    // .attachFiles('vendingPriceHistory.jpg')
-    // .setImage('attachment://vendingPriceHistory.jpg')
+    .attachFiles('plot.png')
+    .setImage('attachment://plot.png')
     .setThumbnail(thumbnailUrl)
     .setAuthor(itemName)
     .addFields(
       {
-        name: 'Requested by',
-        value: `<@${msg.author.id}>`
-      },
-      {
         name: `Mean`,
-        value: mean ? mean : 'Unavailable',
+         value: mean,
+         inline: true
       },
       {
         name: `Median`,
-        value: median ? median : 'Unavailable',
+         value: median,
+         inline: true
       },
       {
-        name: mode ? `Mode(s) | Highest frequency: ${highestFrequency} | Number of prices: ${arrOfPrices.length}` : `Mode(s)`,
-        value: mode ? mode : 'Unavailable',
+        name: `Mode(s) | ${highestFrequency}/${arrOfPrices.length}`,
+        value: mode.map(x => x.toLocaleString('en-US')),
       },
       {
-        name: `Lowest Price`,
-        value: lowestPrice ? lowestPrice : 'Unavailable',
+        name: `Highest`,
+        value: highestPrice,
         inline: true
       },
       {
-        name: `Highest Price`,
-        value: highestPrice ? highestPrice : 'Unavailable',
+        name: `Lowest`,
+        value: lowestPrice,
         inline: true
       },
       {
-        name: `Lowest current sale`,
-        value: lowestCurrentSale ? lowestCurrentSale : 'Unavailable',
-      },
-      {
-        name: `Date from`,
-        value: dateFrom ? dateFrom : 'Unavailable',
+        name: `Lowest CURRENT`,
+        value: lowestCurrentSale ? lowestCurrentSale : 'N/A',
         inline: true
       },
-      {
-        name: `Date to`,
-        value: dateTo ? dateTo : 'Unavailable',
-        inline: true
-      }
     )
 
   await msg.channel.send(embed);
