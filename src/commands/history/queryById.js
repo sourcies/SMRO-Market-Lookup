@@ -39,7 +39,7 @@ const queryById = async (arg, msg) => {
   // Scrape the price of current sales from Vending Information
   const arrayOfSales = []
   vendingInfoTable?.find('tbody').find('tr').each(function (i, elem) {
-    const priceString = $(this).find('td.price').text()
+    const priceString = $(this).find('td.price').text().trim()
     const priceStringClean = priceString.trim().slice(0, -1).replace(/,/g, '').trim()
     const priceNumber = Number(priceStringClean)
     arrayOfSales.push(isNaN(priceNumber) ? 0 : priceNumber)
@@ -50,7 +50,7 @@ const queryById = async (arg, msg) => {
   const arrToCsv = []
   const arrToTable = []
   vendingPriceHistoryTable?.find('tbody').find('tr').each(function (i, elem) {
-    const priceString = $(this).find('td.price').text()
+    const priceString = $(this).find('td.price').text().trim()
     const priceStringClean = priceString.trim().slice(0, -1).replace(/,/g, '').trim()
     const priceNumber = Number(priceStringClean)
 
@@ -70,8 +70,6 @@ const queryById = async (arg, msg) => {
   const itemName = h3Elements.first().text().trim()
   const thumbnailUrl = `https://www.shining-moon.com${$('table.vertical-table').first().find('img').attr('src')}` || `https://www.shining-moon.com/hel/themes/default/img/logo.gif`
   const lowestCurrentSale = (arrayOfSales[0])?.toLocaleString('en-US')
-  const dateTo = vendingPriceHistoryTable?.find('tbody').find('tr').first().find('td').first().text()
-  const dateFrom = vendingPriceHistoryTable?.find('tbody').find('tr').last().find('td').first().text()
   const mean = arrOfPrices.length ? Math.floor(math.mean(arrOfPrices)).toLocaleString('en-US') : undefined
   const median = arrOfPrices.length ? Math.floor(math.median(arrOfPrices)).toLocaleString('en-US') : undefined
   const mode = arrOfPrices.length ? math.mode(arrOfPrices) : undefined
