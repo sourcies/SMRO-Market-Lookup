@@ -12,7 +12,7 @@ const queryByName = async (arg, msg, client) => {
 
   const $ = cheerio.load(body)
 
-  // Return error message if invalid id
+  // Return error message if no item was found
   if ($('table').length === 0) {
     const embed = new discord.MessageEmbed()
       .setTitle('No item found with that name')
@@ -22,6 +22,13 @@ const queryByName = async (arg, msg, client) => {
     return msg.reply(embed)
   }
 
+  // If only one result when querying by name, query by ID right away
+  if ($('tr').length === 1) {
+    const itemID = mapOfIDAndName.keys().next().value
+    return queryById(itemID, msg)
+  }
+
+  // Creating a map for the item id and item name
   const mapOfIDAndName = new Map()
   $('tr').each(function (i, elem) {
     if (i > 10) return
@@ -34,12 +41,7 @@ const queryByName = async (arg, msg, client) => {
     }
   })
 
-  // If only one result when querying by name, query by ID right away
-  if (mapOfIDAndName.size === 1) {
-    const itemID = mapOfIDAndName.keys().next().value
-    return queryById(itemID, msg)
-  }
-
+  // Building the message to be sent
   let description = ``
   let counter = 1
   const mapOfReactAndID = new Map()
@@ -59,12 +61,14 @@ const queryByName = async (arg, msg, client) => {
 
   const sentMessage = await msg.reply(embed)
 
+  // React to the sentMessagee
   for (let counter = 1; counter <= mapOfIDAndName.size; counter++) {
     const emojiString = counterToEmoji(counter)
     await sentMessage.react(emojiString)
   }
 
-  client.on('messageReactionAdd', (messageReaction, user) => {
+  // Listen once for the reaction
+  client.once('messageReactionAdd', (messageReaction, user) => {
     if (messageReaction.message.id === sentMessage.id && user.id === msg.author.id) {
       const counter = emojiToCounter(messageReaction.emoji.name)
       if (counter <= 10) {
