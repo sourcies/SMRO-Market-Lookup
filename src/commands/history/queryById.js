@@ -39,7 +39,6 @@ const queryById = async (arg, msg) => {
   
   // Scrape the price of past sales from Vending Price History
   const arrOfPrices = []
-  // const arrToCsv = [['Date', 'Card 1', 'Card 2', 'Card3', 'Card 4', 'Price', 'Amount']]
   const arrToCsv = []
   vendingPriceHistoryTable?.find('tbody').find('tr').each(function (i, elem) {
     const priceString = $(this).find('td.price').text()
@@ -54,7 +53,7 @@ const queryById = async (arg, msg) => {
     const amount = $(this).find('td').last().text().trim()
 
     arrToCsv.push([date, card1, card2, card3, card4, priceNumber.toLocaleString('en-US'), amount])
-
+    arrTo
     arrOfPrices.push(isNaN(priceNumber) ? 0 : priceNumber)
   })
 
