@@ -8,6 +8,8 @@ const { table } = require('table')
 const { writeFileSync } = require("fs")
 
 const queryById = async (arg, msg) => {
+  const confirmationMessage = await msg.reply(`Processing request...`)
+
   const url = `https://www.shining-moon.com/hel/?module=item&action=view&id=${arg}&price_order=asc&name_japanese_order=none&date_order=desc`
   const response = await fetch(url)
   const body = await response.text()
@@ -21,6 +23,7 @@ const queryById = async (arg, msg) => {
       .setColor(16711680)
       .setTimestamp()
 
+    confirmationMessage.delete()
     return msg.reply(embed)
   }
 
@@ -88,6 +91,7 @@ const queryById = async (arg, msg) => {
       .setThumbnail(thumbnailUrl)
       .setAuthor(itemName)
 
+    confirmationMessage.delete()
     return msg.reply(embed)
   }
 
@@ -99,8 +103,9 @@ const queryById = async (arg, msg) => {
   await csvWriter.writeRecords(arrToCsv.reverse())
   execSync(`python3 src/helpers/generateTable.py ${median}`)
 
+  // Build table
   const data = table(arrToTable)
-  writeFileSync('dump/table.txt', data)
+  writeFileSync('dump/h_table.txt', data)
 
   const embed = new discord.MessageEmbed()
     .setTitle('Vending Price History Summary')
@@ -108,7 +113,7 @@ const queryById = async (arg, msg) => {
     .setTimestamp()
     .setColor(15913595)
     .setFooter(`Requested by ${msg.author.tag}`)
-    .attachFiles('dump/table.txt')
+    .attachFiles('dump/h_table.txt')
     .attachFiles('dump/plot.png')
     .setImage('attachment://dump/plot.png')
     .setThumbnail(thumbnailUrl)
@@ -145,7 +150,8 @@ const queryById = async (arg, msg) => {
       },
     )
 
-  await msg.channel.send(embed);
+  confirmationMessage.delete()
+  msg.channel.send(embed);
 }
 
 module.exports = { queryById }
