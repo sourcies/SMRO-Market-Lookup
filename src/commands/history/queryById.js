@@ -94,13 +94,13 @@ const queryById = async (arg, msg) => {
   // Build csv
   const csvWriter = createCsvWriter({
     header: ['date', 'price'],
-    path: 'data.csv'
+    path: 'dump/data.csv'
   })
   await csvWriter.writeRecords(arrToCsv.reverse())
   execSync(`python3 src/helpers/generateTable.py ${median}`)
 
   const data = table(arrToTable)
-  writeFileSync('table.txt', data)
+  writeFileSync('dump/table.txt', data)
 
   const embed = new discord.MessageEmbed()
     .setTitle('Vending Price History Summary')
@@ -108,9 +108,9 @@ const queryById = async (arg, msg) => {
     .setTimestamp()
     .setColor(15913595)
     .setFooter(`Requested by ${msg.author.tag}`)
-    .attachFiles('table.txt')
-    .attachFiles('plot.png')
-    .setImage('attachment://plot.png')
+    .attachFiles('dump/table.txt')
+    .attachFiles('dump/plot.png')
+    .setImage('attachment://dump/plot.png')
     .setThumbnail(thumbnailUrl)
     .setAuthor(itemName)
     .addFields(
