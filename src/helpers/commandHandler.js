@@ -8,7 +8,7 @@ const handleCommand = (msg, client) => {
   const command = msg.content.split(CONFIG.command_prefix)[1].split(' ')[0]
   if (command === 'h') return lookUpHistory(msg, client)
   if (command === 'ws') return lookUpWhosell(msg, client)
-  return msg.reply(`Wrong command`)
+  // return msg.reply(`Wrong command`)
 }
 
 module.exports = { handleCommand }
