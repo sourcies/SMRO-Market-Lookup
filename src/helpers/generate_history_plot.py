@@ -1,12 +1,10 @@
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import pandas as pd
-from collections import Counter
 import datetime
 import sys
-import numpy as np
 
-df = pd.read_csv('dump/data.csv').values
+df = pd.read_csv('dump/h_data.csv').values
 dates = [datetime.date.fromisoformat(x).strftime(('%b%d')) for x in df[:, 0]]
 prices = df[:,1]
 
@@ -43,5 +41,5 @@ plt.plot(range(len(dates)), prices)
 plt.legend(['Mean (avg)', 'Median'])
 plt.subplots_adjust(left=0.15, right=0.96, top=0.91, bottom=0.15)
 plt.grid()
-plt.savefig('dump/plot.png')
+plt.savefig('dump/h_plot.png')
 # plt.show()

@@ -98,10 +98,10 @@ const queryById = async (arg, msg) => {
   // Build csv
   const csvWriter = createCsvWriter({
     header: ['date', 'price'],
-    path: 'dump/data.csv'
+    path: 'dump/h_data.csv'
   })
   await csvWriter.writeRecords(arrToCsv.reverse())
-  execSync(`python3 src/helpers/generateTable.py ${median}`)
+  execSync(`python3 src/helpers/generate_history_plot.py ${median}`)
 
   // Build table
   const data = table(arrToTable)
@@ -115,8 +115,8 @@ const queryById = async (arg, msg) => {
     .setColor(15913595)
     .setFooter(`Requested by ${msg.author.tag}`)
     .attachFiles('dump/h_table.txt')
-    .attachFiles('dump/plot.png')
-    .setImage('attachment://plot.png')
+    .attachFiles('dump/h_plot.png')
+    .setImage('attachment://h_plot.png')
     .setThumbnail(thumbnailUrl)
     .setAuthor(itemName)
     .addFields(
