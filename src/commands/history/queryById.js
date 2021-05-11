@@ -64,7 +64,7 @@ const queryById = async (arg, msg) => {
     const card4 = $(this).find('td').eq(5).text().trim()
     const amount = $(this).find('td').last().text().trim()
 
-    arrToTable.push([date, card1, card2, card3, card4, priceNumber.toLocaleString('en-US'), amount])
+    arrToTable.push([date, card1, card2, card3, card4, priceString, amount])
     arrToCsv.push([date.split(' ')[0], priceNumber])
     arrOfPrices.push(isNaN(priceNumber) ? 0 : priceNumber)
   })
@@ -109,13 +109,14 @@ const queryById = async (arg, msg) => {
 
   const embed = new discord.MessageEmbed()
     .setTitle('Vending Price History Summary')
+    .setDescription(`Most recent 20 transactions`)
     .setURL(url)
     .setTimestamp()
     .setColor(15913595)
     .setFooter(`Requested by ${msg.author.tag}`)
     .attachFiles('dump/h_table.txt')
     .attachFiles('dump/plot.png')
-    .setImage('attachment://dump/plot.png')
+    .setImage('attachment://plot.png')
     .setThumbnail(thumbnailUrl)
     .setAuthor(itemName)
     .addFields(
