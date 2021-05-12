@@ -23,7 +23,8 @@ const queryByName = async (arg, msg, client) => {
   }
 
   // If only one result when querying by name, query by ID right away
-  if ($('tr').length === 1) {
+  // One result meanss 2 <tr> because header of table is included
+  if ($('tr').length === 2) {
     const itemID = mapOfIDAndName.keys().next().value
     return queryById(itemID, msg)
   }
