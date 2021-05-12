@@ -15,6 +15,6 @@
     "mathjs": "^9.3.2",
     "node-fetch": "^2.6.1",
     "table": "^6.7.0",
-    "toml": "^3.0.0"
+    "toml-loader": "github:wizo06/toml-loader"
   }
 }

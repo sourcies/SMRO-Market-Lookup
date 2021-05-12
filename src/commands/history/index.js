@@ -2,9 +2,7 @@ const logger = require('logger')
 const { queryById } = require('src/commands/history/queryById.js')
 const { queryByName } = require('src/commands/history/queryByName.js')
 const { isNumber } = require('src/helpers/argumentHandler.js')
-const { loadToml } = require('src/helpers/tomlLoader.js')
-
-const CONFIG = loadToml('config/config.toml')
+const CONFIG = require('src/helpers/configLoader.js')
 
 const errMsg = `
 \`\`\`

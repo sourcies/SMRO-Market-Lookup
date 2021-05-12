@@ -1,9 +1,7 @@
 const discord = require('discord.js')
 const { handleCommand } = require('src/helpers/commandHandler.js')
 const logger = require('logger')
-const { loadToml } = require('src/helpers/tomlLoader.js')
-
-const CONFIG = loadToml('config/config.toml')
+const CONFIG = require('src/helpers/configLoader.js')
 
 const client = new discord.Client()
 
