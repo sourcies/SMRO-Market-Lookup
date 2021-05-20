@@ -21,6 +21,19 @@ const queryByName = async (arg, msg, client) => {
 
     return msg.reply(embed)
   }
+  
+    // Creating a map for the item id and item name
+    const mapOfIDAndName = new Map()
+    $('tr').each(function (i, elem) {
+      if (i > 10) return
+      if (i !== 0) {
+        const itemID = $(this).find('td').eq(0).text().replace(/\n/g, '').trim()
+        let itemName = undefined
+        if ($(this).find('td').length === 16) itemName = $(this).find('td').eq(2).text().replace(/\n/g, '').trim()
+        else itemName = $(this).find('td').eq(1).text().replace(/\n/g, '').trim()
+        mapOfIDAndName.set(itemID, itemName)
+      }
+    })
 
   // If only one result when querying by name, query by ID right away
   // One result meanss 2 <tr> because header of table is included
@@ -28,19 +41,6 @@ const queryByName = async (arg, msg, client) => {
     const itemID = mapOfIDAndName.keys().next().value
     return queryById(itemID, msg)
   }
-
-  // Creating a map for the item id and item name
-  const mapOfIDAndName = new Map()
-  $('tr').each(function (i, elem) {
-    if (i > 10) return
-    if (i !== 0) {
-      const itemID = $(this).find('td').eq(0).text().replace(/\n/g, '').trim()
-      let itemName = undefined
-      if ($(this).find('td').length === 16) itemName = $(this).find('td').eq(2).text().replace(/\n/g, '').trim()
-      else itemName = $(this).find('td').eq(1).text().replace(/\n/g, '').trim()
-      mapOfIDAndName.set(itemID, itemName)
-    }
-  })
 
   // Building the message to be sent
   let description = ``
