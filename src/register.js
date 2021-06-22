@@ -73,10 +73,9 @@
       ]
     }
   
-    const guild = await client.guilds.fetch(CONFIG.guildID)
-    await guild.commands.create(history)
+    await client.application.commands.create(history)
     logger.success('history command created')
-    await guild.commands.create(whosell)
+    await client.application.commands.create(whosell)
     logger.success('whosell command created')
 
     await client.destroy()
