@@ -1,16 +1,16 @@
 const fetch = require('node-fetch')
 const cheerio = require('cheerio')
 const math = require('mathjs')
-const discord = require('discord.js')
+const { MessageEmbed, MessageAttachment } = require('discord.js')
 const createCsvWriter = require('csv-writer').createArrayCsvWriter
 const { execSync } = require('child_process')
 const { table } = require('table')
 const { writeFileSync } = require("fs")
 
-const queryById = async (arg, msg) => {
-  const confirmationMessage = await msg.reply(`Processing request...`)
+const queryById = async ({itemID, interaction, defer = true}) => {
+  if (defer) await interaction.defer()
 
-  const url = `https://www.shining-moon.com/hel/?module=item&action=view&id=${arg}&price_order=asc&name_japanese_order=none&date_order=desc`
+  const url = `https://www.shining-moon.com/hel/?module=item&action=view&id=${itemID}&price_order=asc&name_japanese_order=none&date_order=desc`
   const response = await fetch(url)
   const body = await response.text()
 
@@ -18,13 +18,12 @@ const queryById = async (arg, msg) => {
   
   // Return error message if invalid id
   if ($('div.adjust').length === 0) {
-    const embed = new discord.MessageEmbed()
+    const embed = new MessageEmbed()
       .setTitle('Invaild ID')
       .setColor(16711680)
       .setTimestamp()
 
-    confirmationMessage.delete()
-    return msg.reply(embed)
+    return await interaction.editReply({ embeds: [embed] })
   }
 
   const h3Elements = $('h3')
@@ -83,7 +82,7 @@ const queryById = async (arg, msg) => {
 
   // Return error message if table not found
   if (!vendingPriceHistoryTable) {
-    const embed = new discord.MessageEmbed()
+    const embed = new MessageEmbed()
       .setTitle('Vending Price History table not found')
       .setURL(url)
       .setTimestamp()
@@ -91,8 +90,7 @@ const queryById = async (arg, msg) => {
       .setThumbnail(thumbnailUrl)
       .setAuthor(itemName)
 
-    confirmationMessage.delete()
-    return msg.reply(embed)
+    return await interaction.editReply({ embeds: [embed] })
   }
 
   // Build csv
@@ -107,19 +105,17 @@ const queryById = async (arg, msg) => {
   const data = table(arrToTable)
   writeFileSync('dump/h_table.txt', data)
 
-  const embed = new discord.MessageEmbed()
+  const embed = new MessageEmbed()
     .setTitle('Vending Price History Summary')
     .setDescription(`Most recent 20 transactions`)
     .setURL(url)
     .setTimestamp()
     .setColor(15913595)
-    .setFooter(`Requested by ${msg.author.tag}`)
-    .attachFiles('dump/h_table.txt')
-    .attachFiles('dump/h_plot.png')
+    .setFooter(`Requested by ${interaction.user.username}`)
     .setImage('attachment://h_plot.png')
     .setThumbnail(thumbnailUrl)
     .setAuthor(itemName)
-    .addFields(
+    .addFields([
       {
         name: `Mean`,
          value: mean,
@@ -132,7 +128,7 @@ const queryById = async (arg, msg) => {
       },
       {
         name: `Mode(s) | ${highestFrequency}/${arrOfPrices.length}`,
-        value: mode.map(x => x.toLocaleString('en-US')),
+        value: mode.map(x => x.toLocaleString('en-US')).join('\n'),
       },
       {
         name: `Highest`,
@@ -149,10 +145,18 @@ const queryById = async (arg, msg) => {
         value: lowestCurrentSale ? lowestCurrentSale : 'N/A',
         inline: true
       },
-    )
+    ])
 
-  confirmationMessage.delete()
-  msg.channel.send(embed);
+  const attchTable = new MessageAttachment()
+    .setFile('dump/h_table.txt')
+  
+  const attchPlot = new MessageAttachment()
+    .setFile('dump/h_plot.png')
+
+  await interaction.editReply({
+    files: [attchTable, attchPlot], 
+    embeds: [embed]
+  })
 }
 
 module.exports = { queryById }

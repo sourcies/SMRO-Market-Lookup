@@ -1,1 +1,1 @@
-module.exports = require('toml-loader')('../../config/config.toml')
+module.exports = require('@iarna/toml').parse(require('fs').readFileSync('config/config.toml'))

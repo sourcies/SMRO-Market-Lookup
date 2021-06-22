@@ -3,22 +3,24 @@
 # Requirements
 
 - NodeJS
+- npm 7+
 - python3
+- pip3
 
 # Getting started
 
-Discord bot permissions
+1. Create a Discord Application in the developer portal and add it to your Discord server with the following OAuth2 scope:
 
-- View Channels
-- Send Messages
-- Embed Links
-- Attach Files
-- Read Message History
-- Add Reactions
+- `applications.commands`
 
-```
-cp config/template.toml config/config.toml
-pip3 install -r requirements.txt
-npm i
-npm start
-```
+2. Then, deploy the bot
+
+    2.1. Edit `config.toml` file
+    
+    2.2.
+    ```
+    pip3 install -r requirements.txt
+    npm i
+    npm run register
+    npm start
+    ```

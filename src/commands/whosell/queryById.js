@@ -1,15 +1,15 @@
 const fetch = require('node-fetch')
 const cheerio = require('cheerio')
-const discord = require('discord.js')
+const { MessageEmbed, MessageAttachment } = require('discord.js')
 const createCsvWriter = require('csv-writer').createArrayCsvWriter
 const { execSync } = require('child_process')
 const { table } = require('table')
 const { writeFileSync } = require("fs")
 
-const queryById = async (arg, msg) => {
-  const confirmationMessage = await msg.reply(`Processing request...`)
+const queryById = async ({ itemID, interaction, defer = true }) => {
+  if (defer) await interaction.defer()
 
-  const url = `https://www.shining-moon.com/hel/?module=item&action=view&id=${arg}&price_order=asc&name_japanese_order=none&date_order=desc`
+  const url = `https://www.shining-moon.com/hel/?module=item&action=view&id=${itemID}&price_order=asc&name_japanese_order=none&date_order=desc`
   const response = await fetch(url)
   const body = await response.text()
 
@@ -17,12 +17,12 @@ const queryById = async (arg, msg) => {
   
   // Return error message if invalid id
   if ($('div.adjust').length === 0) {
-    const embed = new discord.MessageEmbed()
+    const embed = new MessageEmbed()
       .setTitle('Invaild ID')
       .setColor(16711680)
       .setTimestamp()
-    confirmationMessage.delete()
-    return msg.reply(embed)
+
+    return await interaction.editReply({ embeds: [embed] })
   }
 
   const h3Elements = $('h3')
@@ -40,7 +40,7 @@ const queryById = async (arg, msg) => {
   
   // Return error message if table not found
   if (!vendingInfoTable) {
-    const embed = new discord.MessageEmbed()
+    const embed = new MessageEmbed()
       .setTitle('Vending Information table not found')
       .setURL(url)
       .setTimestamp()
@@ -48,8 +48,7 @@ const queryById = async (arg, msg) => {
       .setThumbnail(thumbnailUrl)
       .setAuthor(itemName)
 
-    confirmationMessage.delete()
-    return msg.reply(embed)
+    return await interaction.editReply({ embeds: [embed] })
   }
   
   // Scrape the price of current sales from Vending Information
@@ -117,15 +116,13 @@ const queryById = async (arg, msg) => {
   const data = table(arrToTable)
   writeFileSync('dump/ws_table.txt', data)
 
-  const embed = new discord.MessageEmbed()
+  const embed = new MessageEmbed()
     .setTitle('Vending Information Summary')
     .setDescription(`Ascending order by **Price**`)
     .setURL(url)
     .setTimestamp()
     .setColor(15913595)
-    .setFooter(`Requested by ${msg.author.tag}`)
-    .attachFiles('dump/ws_table.txt')
-    .attachFiles('dump/ws_plot.png')
+    .setFooter(`Requested by ${interaction.user.username}`)
     .setImage('attachment://ws_plot.png')
     .setThumbnail(thumbnailUrl)
     .setAuthor(itemName)
@@ -142,21 +139,19 @@ const queryById = async (arg, msg) => {
       },
       {
         name: `Total number of vendors`,
-        value: arrayOfSales.length
+        value: arrayOfSales.length.toString()
       }
     )
 
-  confirmationMessage.delete()
-  await msg.channel.send(embed);
-}
+  const attchTable = new MessageAttachment()
+    .setFile('dump/ws_table.txt')
 
-const getShopLocation = (url) => {
-  return new Promise(async (resolve, reject) => {
-    const response = await fetch(url)
-    const body = await response.text()
-    $ = cheerio.load(body)
-    const shopLocation = $('h4').text().trim()
-    resolve(shopLocation)
+  const attchPlot = new MessageAttachment()
+    .setFile('dump/ws_plot.png')
+
+  await interaction.editReply({
+    files: [attchTable, attchPlot],
+    embeds: [embed]
   })
 }
 
