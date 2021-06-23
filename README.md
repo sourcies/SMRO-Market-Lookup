@@ -12,6 +12,7 @@
 1. Create a Discord Application in the developer portal and add it to your Discord server with the following OAuth2 scope:
 
 - `applications.commands`
+- `bot`
 
 2. Then, deploy the bot
 
@@ -24,3 +25,5 @@
     npm run register
     npm start
     ```
+
+    Commands will fan out slowly across all guilds within one hour.

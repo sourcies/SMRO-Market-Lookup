@@ -5,6 +5,7 @@ const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js')
 const { queryById } = require('src/commands/history/queryById.js')
 
 const queryByName = async ({itemName, interaction}) => {
+  logger.info(`history name ${itemName}`)
   await interaction.defer()
 
   const url = `https://www.shining-moon.com/hel/?module=item&name=${encodeURI(itemName)}&script=&type=-1&equip_loc=-1&npc_buy_op=eq&npc_buy=&npc_sell_op=eq&npc_sell=&weight_op=eq&weight=&range_op=eq&range=&slots_op=eq&slots=&defense_op=eq&defense=&attack_op=eq&attack=&matk_op=eq&matk=&refineable=&for_sale=&custom=`
@@ -71,8 +72,9 @@ const queryByName = async ({itemName, interaction}) => {
   if (actionRow4.components.length != 0) actionRows.push(actionRow4)
   if (actionRow5.components.length != 0) actionRows.push(actionRow5)
 
-  const msg = await interaction.editReply({ embeds: [embed], components: actionRows })
-
+  await interaction.editReply({ embeds: [embed], components: actionRows })
+  const msg = await interaction.fetchReply()
+  console.log(msg)
   const filter = itr => itr.user.id === interaction.user.id
   const itrBtn = await msg.awaitMessageComponentInteraction(filter)
 

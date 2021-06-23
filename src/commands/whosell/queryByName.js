@@ -5,6 +5,7 @@ const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js')
 const { queryById } = require('src/commands/whosell/queryById.js')
 
 const queryByName = async ({itemName, interaction}) => {
+  logger.info(`whosell name ${itemName}`)
   await interaction.defer()
 
   const url = `https://www.shining-moon.com/hel/?module=item&name=${encodeURI(itemName)}&script=&type=-1&equip_loc=-1&npc_buy_op=eq&npc_buy=&npc_sell_op=eq&npc_sell=&weight_op=eq&weight=&range_op=eq&range=&slots_op=eq&slots=&defense_op=eq&defense=&attack_op=eq&attack=&matk_op=eq&matk=&refineable=&for_sale=&custom=`

@@ -1,3 +1,4 @@
+const logger = require('logger')
 const fetch = require('node-fetch')
 const cheerio = require('cheerio')
 const math = require('mathjs')
@@ -8,6 +9,7 @@ const { table } = require('table')
 const { writeFileSync } = require("fs")
 
 const queryById = async ({itemID, interaction, defer = true}) => {
+  logger.info(`history id ${itemID}`)
   if (defer) await interaction.defer()
 
   const url = `https://www.shining-moon.com/hel/?module=item&action=view&id=${itemID}&price_order=asc&name_japanese_order=none&date_order=desc`
