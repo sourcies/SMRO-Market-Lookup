@@ -2,7 +2,6 @@
   "name": "smro-market-lookup",
   "version": "2.0.0",
   "workspaces": [
-    "config",
     "src"
   ],
   "scripts": {

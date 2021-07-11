@@ -6,7 +6,7 @@ const { MessageEmbed, MessageAttachment } = require('discord.js')
 const createCsvWriter = require('csv-writer').createArrayCsvWriter
 const { execSync } = require('child_process')
 const { table } = require('table')
-const { writeFileSync } = require("fs")
+const { writeFileSync, mkdirSync } = require("fs")
 
 const queryById = async ({itemID, interaction, defer = true}) => {
   logger.info(`history id ${itemID}`)
@@ -96,6 +96,7 @@ const queryById = async ({itemID, interaction, defer = true}) => {
   }
 
   // Build csv
+  mkdirSync('dump')
   const csvWriter = createCsvWriter({
     header: ['date', 'price'],
     path: 'dump/h_data.csv'

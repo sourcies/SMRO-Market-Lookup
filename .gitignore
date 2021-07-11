@@ -1,3 +1,4 @@
 node_modules/
-dump/*
-!dump/placeholder
+config/*
+!config/*template*.toml
+dump/
