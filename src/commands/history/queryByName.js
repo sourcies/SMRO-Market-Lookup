@@ -1,7 +1,7 @@
 const logger = require('logger')
 const fetch = require('node-fetch')
 const cheerio = require('cheerio')
-const { MessageEmbed, MessageSelectMenu, Options } = require('discord.js')
+const { MessageEmbed, MessageSelectMenu } = require('discord.js')
 const { queryById } = require('src/commands/history/queryById.js')
 
 const queryByName = async ({itemName, interaction}) => {
@@ -52,8 +52,7 @@ const queryByName = async ({itemName, interaction}) => {
     .setPlaceholder('Please select an item')
     .addOptions(options)
   
-  await interaction.editReply({ content: '** **', components: [[menu]] })
-  const msg = await interaction.fetchReply()
+  const msg = await interaction.editReply({ content: '** **', components: [[menu]] })
   const filter = itr => itr.user.id === interaction.user.id
   const selectMenuItr = await msg.awaitMessageComponent(filter)
   await selectMenuItr.update({ content: `Looking up \`${selectMenuItr.values[0]}\`...`, components: [] })
