@@ -96,7 +96,7 @@ const queryById = async ({itemID, interaction, defer = true}) => {
   }
 
   // Build csv
-  mkdirSync('dump')
+  mkdirSync('dump', { recursive: true })
   const csvWriter = createCsvWriter({
     header: ['date', 'price'],
     path: 'dump/h_data.csv'
@@ -157,6 +157,7 @@ const queryById = async ({itemID, interaction, defer = true}) => {
     .setFile('dump/h_plot.png')
 
   await interaction.editReply({
+    content: '** **',
     files: [attchTable, attchPlot], 
     embeds: [embed]
   })

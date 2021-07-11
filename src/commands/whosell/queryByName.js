@@ -1,7 +1,7 @@
 const logger = require('logger')
 const fetch = require('node-fetch')
 const cheerio = require('cheerio')
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js')
+const { MessageEmbed, MessageSelectMenu } = require('discord.js')
 const { queryById } = require('src/commands/whosell/queryById.js')
 
 const queryByName = async ({itemName, interaction}) => {
@@ -31,13 +31,7 @@ const queryByName = async ({itemName, interaction}) => {
     return queryById({ itemID, interaction, defer: false })
   }
 
-  // Build action rows with buttons
-  const actionRow1 = new MessageActionRow()
-  const actionRow2 = new MessageActionRow()
-  const actionRow3 = new MessageActionRow()
-  const actionRow4 = new MessageActionRow()
-  const actionRow5 = new MessageActionRow()
-
+  const options = []
   $('tr').each(function (i, elem) {
     if (i === 0) return
 
@@ -46,38 +40,24 @@ const queryByName = async ({itemName, interaction}) => {
     if ($(this).find('td').length === 16) itemName = $(this).find('td').eq(2).text().replace(/\n/g, '').trim()
     else itemName = $(this).find('td').eq(1).text().replace(/\n/g, '').trim()
 
-    const btn = new MessageButton()
-      .setCustomID(itemID)
-      .setLabel(`${itemID}: ${itemName}`)
-      .setStyle('PRIMARY')
-
-    if (i >= 0 && i <= 4) actionRow1.addComponents(btn)
-    if (i >= 5 && i <= 9) actionRow2.addComponents(btn)
-    if (i >= 10 && i <= 14) actionRow3.addComponents(btn)
-    if (i >= 15 && i <= 19) actionRow4.addComponents(btn)
-    if (i >= 20 && i <= 24) actionRow5.addComponents(btn)
+    options.push({
+      label: itemID, 
+      description: itemName.slice(0,50), // Description must be 50 or fewer in length
+      value: itemID
+    })
   })
 
-  const embed = new MessageEmbed()
-    .setTitle(`Please select an item`)
-    .setURL(url)
-    .setTimestamp()
-    .setColor(15913595)
-    .setFooter(`Requested by ${interaction.user.username}`)
+  const menu = new MessageSelectMenu()
+    .setCustomId('select')
+    .setPlaceholder('Please select an item')
+    .addOptions(options)
 
-  const actionRows = []
-  if (actionRow1.components.length != 0) actionRows.push(actionRow1)
-  if (actionRow2.components.length != 0) actionRows.push(actionRow2)
-  if (actionRow3.components.length != 0) actionRows.push(actionRow3)
-  if (actionRow4.components.length != 0) actionRows.push(actionRow4)
-  if (actionRow5.components.length != 0) actionRows.push(actionRow5)
-
-  const msg = await interaction.editReply({ embeds: [embed], components: actionRows })
-
+  const msg = await interaction.editReply({ content: '** **', components: [[menu]] })
   const filter = itr => itr.user.id === interaction.user.id
-  const itrBtn = await msg.awaitMessageComponentInteraction(filter)
+  const selectMenuItr = await msg.awaitMessageComponent(filter)
+  await selectMenuItr.update({ content: `Looking up \`${selectMenuItr.values[0]}\`...`, components: [] })
 
-  queryById({ itemID: itrBtn.customID, interaction: itrBtn })
+  queryById({ itemID: selectMenuItr.values[0], interaction, defer: false })
 }
 
 module.exports = { queryByName }

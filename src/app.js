@@ -22,7 +22,7 @@ client.on('message', async msg => {
   }
 })
 
-client.on('interaction', async interaction => {
+client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand()) return
 
   if (interaction.commandName === 'history' && interaction.options.get('id')) {
