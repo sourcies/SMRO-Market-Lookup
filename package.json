@@ -14,7 +14,7 @@
     "@iarna/toml": "^2.2.5",
     "cheerio": "*",
     "csv-writer": "^1.6.0",
-    "discord.js": "^13.0.0-dev.5b6be0c.1625789033",
+    "discord.js": "^13.0.0-dev.d433fe8.1626004976",
     "logger": "github:wizo06/logger",
     "mathjs": "^9.3.2",
     "node-fetch": "^2.6.1",
