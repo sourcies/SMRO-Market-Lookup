@@ -16,7 +16,10 @@
 
 2. Then, deploy the bot
 
-    2.1. Edit `config.toml` file
+    2.1. Copy config file and edit accordingly
+    ```
+    copy config/config-template.toml config/config.toml
+    ```
     
     2.2.
     ```
