@@ -1,4 +1,4 @@
-const logger = require('logger')
+const logger = require('@wizo06/logger')
 const fetch = require('node-fetch')
 const cheerio = require('cheerio')
 const { MessageEmbed, MessageAttachment } = require('discord.js')

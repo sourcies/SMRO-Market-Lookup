@@ -1,4 +1,4 @@
-const logger = require('logger')
+const logger = require('@wizo06/logger')
 const CONFIG = require('src/helpers/configLoader.js')
 const { Client, Intents } = require('discord.js')
 

@@ -1,7 +1,7 @@
 (async () => {
   try {
     const { Client, Intents } = require('discord.js')
-    const logger = require('logger')
+    const logger = require('@wizo06/logger')
     const CONFIG = require('src/helpers/configLoader.js')
 
     const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] })
